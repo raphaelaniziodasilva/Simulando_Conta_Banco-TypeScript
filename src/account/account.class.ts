@@ -8,7 +8,7 @@ export class Account {
         this.agency = agency
         this.balance = 0
     }
-    /*
+    
     public deposit(value: number): void{ // vai receber um valor
         this.balance += value
     }
@@ -16,5 +16,5 @@ export class Account {
     public withdraw(value: number): void{
         this.balance -= value
     }
-    */
+    
 }
