@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Account = void 0;
+// conta pai
 class Account {
     constructor(account_number, agency) {
         this.account_number = account_number;

@@ -1,3 +1,4 @@
+// conta pai
 export class Account {
      account_number: string
      agency: string
@@ -9,7 +10,7 @@ export class Account {
         this.balance = 0
     }
     
-    public deposit(value: number): void{ // vai receber um valor
+    public deposit(value: number): void { // vai receber um valor
         this.balance += value
     }
 
