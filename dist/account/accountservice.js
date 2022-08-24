@@ -10,13 +10,14 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.remove = exports.update = exports.create = exports.find = exports.findAll = void 0;
+exports.deposit = exports.remove = exports.update = exports.create = exports.find = exports.findAll = void 0;
 // aqui no account service vai ser um serviço que vai prover para nos algumas coisas algumas funcionalidades importantes para podermos trabalhar como o banco de dados funciona
 const cc_class_1 = require("./cc.class");
 const cp_class_1 = require("./cp.class");
+const client_class_1 = require("../client/client.class");
 let accounts = {
-    1: new cc_class_1.CC("01", "01"),
-    2: new cp_class_1.CP("02", "01")
+    1: new cc_class_1.CC("01", "01", new client_class_1.Client("Raphael", "Anizio da silva", "110.675.987-44"), 1),
+    2: new cp_class_1.CP("02", "01", new client_class_1.Client("Raphael", "Anizio da silva", "110.675.987-44"), 2)
 };
 // definindo comportamentos para o nosso serviço, que são formas de acessar os metodos
 // acessando as lista de contas
@@ -27,7 +28,7 @@ const find = (id) => __awaiter(void 0, void 0, void 0, function* () { return acc
 exports.find = find;
 // criando cont cc ou cp
 const create = (newAccount) => __awaiter(void 0, void 0, void 0, function* () {
-    const id = new Date().valueOf(); // vai pegar um valor aleatorio
+    const id = newAccount.getId();
     accounts[id] = newAccount;
     return accounts[id];
 });
@@ -59,3 +60,8 @@ const remove = (id) => __awaiter(void 0, void 0, void 0, function* () {
 });
 exports.remove = remove;
 // agora que a estrutura de serviço esta montada, vamos trabalhar com rotas, crie um arquivo chamado accounts.router.ts
+const deposit = (id, value) => __awaiter(void 0, void 0, void 0, function* () {
+    const account = yield (0, exports.find)(id);
+    return account.deposit(value);
+});
+exports.deposit = deposit;

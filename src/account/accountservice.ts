@@ -6,10 +6,11 @@ import { CC } from "./cc.class";
 import { CP } from "./cp.class";
 import { Accounts } from "./account.interface";
 import { Account } from "./account.class";
+import { Client } from "../client/client.class";
 
 let accounts: Accounts = {
-    1: new CC("01", "01"),
-    2: new CP("02", "01")
+    1: new CC("01", "01", new Client("Raphael", "Anizio da silva", "110.675.987-44"), 1),
+    2: new CP("02", "01", new Client("Raphael","Anizio da silva", "110.675.987-44"), 2)
 }
 // definindo comportamentos para o nosso serviço, que são formas de acessar os metodos
 // acessando as lista de contas
@@ -20,7 +21,8 @@ export const find = async (id:number): Promise<Account> => accounts[id]
 
 // criando cont cc ou cp
 export const create = async (newAccount: CP | CC): Promise<Account>  => {
-    const id = new Date().valueOf() // vai pegar um valor aleatorio
+    
+    const id = newAccount.getId()
 
     accounts[id] = newAccount
     return accounts[id]
@@ -59,4 +61,12 @@ export const remove = async (id: number): Promise< null | void > => {
 }
 
 // agora que a estrutura de serviço esta montada, vamos trabalhar com rotas, crie um arquivo chamado accounts.router.ts
+
+export const deposit = async (id: number, value: number): Promise<number> => {
+    
+    const account = await find(id)
+
+    return account.deposit(value)
+
+}
 

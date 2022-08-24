@@ -42,6 +42,7 @@ const express_1 = __importDefault(require("express")); // ja esta atribuindo o e
 const AccountService = __importStar(require("./accountservice"));
 const cc_class_1 = require("./cc.class");
 const cp_class_1 = require("./cp.class");
+const client_class_1 = require("../client/client.class");
 exports.accountsRouter = express_1.default.Router(); // importando o express dentro da variavel
 // criando o comportamento de rotas
 // listando todas as contas
@@ -49,10 +50,10 @@ exports.accountsRouter.get("/", (req, res) => __awaiter(void 0, void 0, void 0, 
     // trantando erro quando houver ouver erro
     try {
         const accounts = yield AccountService.findAll();
-        res.status(200).send(accounts);
+        return res.status(200).send(accounts);
     }
     catch (e) {
-        res.status(500).send(e.message);
+        return res.status(500).send(e.message);
     }
 }));
 // listando uma unica conta pelo id
@@ -65,29 +66,31 @@ exports.accountsRouter.get("/:id", (req, res) => __awaiter(void 0, void 0, void 
         if (account) {
             res.status(200).send(account);
         }
-        res.status(404).send("Account not found");
+        return res.status(404).send("Account not found");
     }
     catch (error) {
-        res.status(500).send(error.message);
+        return res.status(500).send(error.message);
     }
 }));
 // criando uma conta do tipo cc ou cp
 exports.accountsRouter.post("/create", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
+        const id = new Date().valueOf(); // vai pegar um valor aleatorio
+        const client = new client_class_1.Client(req.body.name, req.body.lasName, req.body.cpf);
         let account;
         // tipo de conta corrente
         if (req.body.type == "cc") {
-            account = new cc_class_1.CC(req.body.account_number, req.body.agency);
+            account = new cc_class_1.CC(req.body.account_number, req.body.agency, client, id);
         }
         else { // tipo de conta poupança
-            account = new cp_class_1.CP(req.body.account_number, req.body.agency);
+            account = new cp_class_1.CP(req.body.account_number, req.body.agency, client, id);
         }
         // criando uma nova conta que pode ser cc ou cp
         const newAccount = yield AccountService.create(account);
-        res.status(201).json(newAccount);
+        return res.status(201).json(newAccount);
     }
     catch (error) {
-        res.status(500).send(error.message);
+        return res.status(500).send(error.message);
     }
     /* use o postman para cadastrar uma nova conta
         {
@@ -113,10 +116,10 @@ exports.accountsRouter.put("/:id", (req, res) => __awaiter(void 0, void 0, void 
         }
         // se a conta não existir eu quero que crie a conta
         const newAccount = yield AccountService.create(accountUpdate);
-        res.status(201).json(newAccount);
+        return res.status(201).json(newAccount);
     }
     catch (error) {
-        res.status(500).send(error.message);
+        return res.status(500).send(error.message);
     }
 }));
 // deletando conta
@@ -125,10 +128,26 @@ exports.accountsRouter.delete("/:id", (req, res) => __awaiter(void 0, void 0, vo
         // transfrmando o id para inteiro
         const id = parseInt(req.params.id, 10);
         yield AccountService.remove(id);
-        res.status(204);
+        return res.status(204);
     }
     catch (error) {
-        res.status(500).send(error.message);
+        return res.status(500).send(error.message);
+    }
+}));
+exports.accountsRouter.post("/:id/deposit", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const id = parseInt(req.params.id, 10);
+        const account = yield AccountService.find(id);
+        if (account) {
+            const value = parseFloat(req.body.value);
+            const balance = yield AccountService.deposit(id, value);
+            let message = (value <= 0) ? "Error! Negative or zero value is not allowed" : "Deposit made";
+            return res.status(201).json({ message: "Deposit made", newBalance: balance });
+        }
+        return res.status(404).send("Account not found");
+    }
+    catch (error) {
+        return res.status(500).send(error.message);
     }
 }));
 // agora vamos para o nosso server.ts
