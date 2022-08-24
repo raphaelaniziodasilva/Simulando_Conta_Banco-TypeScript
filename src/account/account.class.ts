@@ -1,12 +1,14 @@
 import { Client } from "../client/client.class"
 
-// conta pai
+// conta pai vai criar o nosso modelo de conta
 export class Account {
     private id: number
     protected account_number: string
     protected agency: string
     private balance: number
-    public client: Client
+
+    // definindo o cliente. Estou dizendo que eu tenho um atributo que é uma classe chamada client 
+    public client: Client 
 
     constructor(account_number: string, agency: string, client: Client, id: number) {
         this.id = id
@@ -20,15 +22,19 @@ export class Account {
         return this.id
     }
 
+    // vai nos retornar o valor do saldo que temos na conta
     public getBalance(): number {
         return this.balance
     }
-    
-    public deposit(value: number):number { // vai receber um valor
 
+    // depositando dinheiro    
+    public deposit(value: number):number { // vai receber um valor
+        
+        // para evitar que o usuario digite valores negativos -10, -10.5 quando for fazer o deposito
         if(value > 0) {
             this.balance += value
 
+            // vai retornar o nosso saldo atual
             return this.getBalance()
         } 
         return 0

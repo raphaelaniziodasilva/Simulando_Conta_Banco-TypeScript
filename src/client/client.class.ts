@@ -1,3 +1,5 @@
+// criando o modelo do cliente com os seus dados
+
 export class Client {
     public name: string
     public lasName: string

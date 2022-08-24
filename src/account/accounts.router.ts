@@ -52,14 +52,17 @@ accountsRouter.get("/:id", async(req: Request, res: Response) => {
 // criando uma conta do tipo cc ou cp
 accountsRouter.post("/create", async(req: Request, res: Response) => {
     try {
+        const id = new Date().valueOf() // definindo o id vai pegar um valor aleatorio
 
-        const id = new Date().valueOf() // vai pegar um valor aleatorio
-        
+        // vamos precisar adicionar uma intração para poder dicionar um client        
         const client: Client = new Client(req.body.name, req.body.lasName, req.body.cpf)
+
         let account: Account
         // tipo de conta corrente
         if(req.body.type == "cc") {
-            account = new CC(req.body.account_number, req.body.agency, client, id)
+
+            // vamos colocar o nosso cliente dentro das contas cc e cp, agora agente ja consegue adicionar clientes dentro do create rout
+            account = new CC(req.body.account_number, req.body.agency, client, id) 
         } else { // tipo de conta poupança
             account = new CP(req.body.account_number, req.body.agency, client, id)
         }
@@ -73,9 +76,13 @@ accountsRouter.post("/create", async(req: Request, res: Response) => {
     }
     /* use o postman para cadastrar uma nova conta
         {
-            "type": "cc", --> tipo de conta
-            "account_number": "04", --> numero da conta
-            "agency": "01" --> agência
+        
+        
+            "name": "feferfesf",
+            "lastName": "Yegar",
+            "cpf": "145.957.322-98",
+            "account_number": "01",
+            "agency": "02"}
         }
     */
 })
@@ -83,7 +90,7 @@ accountsRouter.post("/create", async(req: Request, res: Response) => {
 // editando conta
 accountsRouter.put("/:id", async(req: Request, res: Response) => {
 
-    // transfrmando o id para inteiro
+    // transformando o id para inteiro
     const id: number = parseInt(req.params.id, 10)
     try {
         // criando como uma nova conta com o valor que vem do body ou seja criando uma conta que vem com o valor que esta dentro do body do postaman
@@ -110,7 +117,7 @@ accountsRouter.put("/:id", async(req: Request, res: Response) => {
 // deletando conta
 accountsRouter.delete("/:id", async(req: Request, res: Response) => {
     try {
-        // transfrmando o id para inteiro
+        // transformando o id para inteiro
         const id: number = parseInt(req.params.id, 10)
 
         await AccountService.remove(id)
@@ -121,21 +128,31 @@ accountsRouter.delete("/:id", async(req: Request, res: Response) => {
     }
 })
 
+// fazendo deposito
 accountsRouter.post("/:id/deposit", async(req: Request, res: Response) => {
     try {
+        // transformando o id para inteiro
         const id: number = parseInt(req.params.id, 10)
 
+        // pegando uma conta 
         const account: Account = await AccountService.find(id)
 
+        // se a conta existir
         if(account) {
-        const value: number = parseFloat(req.body.value)
-        const balance = await AccountService.deposit(id, value)
 
-        let message = (value <= 0)? "Error! Negative or zero value is not allowed": "Deposit made"
+            // transformando o value em valores reais
+            const value: number = parseFloat(req.body.value)
 
-        return res.status(201).json({message: "Deposit made", newBalance: balance})
-      }
+            // fazendo o deposito
+            const balance = await AccountService.deposit(id, value)
 
+            // se o valor do deposito for menor ou igual a zero vai aparecer a menssagem de erro, se o meu valor for maior que zero o deposito esta feito
+            let message = (value <= 0)? "Error! Negative or zero value is not allowed": "Deposit made"
+
+            return res.status(201).json({message: "Deposit made", newBalance: balance})
+        }
+
+        // conta não encontrada 
         return res.status(404).send("Account not found")        
     } catch (error: any) {
         return res.status(500).send(error.message)
