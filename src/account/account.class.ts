@@ -18,11 +18,16 @@ export class Account {
         this.client = client
     }
 
+    public getClient(): Client {
+        return this.client
+
+    }
+
     public getId(): number {
         return this.id
     }
 
-    // vai nos retornar o valor do saldo que temos na conta
+    // vai pegar e retornar o valor do saldo que temos na conta
     public getBalance(): number {
         return this.balance
     }
@@ -40,8 +45,15 @@ export class Account {
         return 0
     }
 
-    public withdraw(value: number): void{
-        this.balance -= value
+    // para fazer saque
+    public withdraw(value: number): number{
+        if(value > 0) {
+            this.balance -= value
+
+            return this.getBalance()
+        }
+        return 0
+      
     }
     
 }

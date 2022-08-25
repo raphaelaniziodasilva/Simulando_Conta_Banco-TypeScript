@@ -1,4 +1,5 @@
 "use strict";
+// criando o modelo do cliente com os seus dados
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Client = void 0;
 class Client {

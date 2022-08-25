@@ -82,3 +82,14 @@ export const deposit = async (id: number, value: number): Promise<number> => {
 
 }
 
+// criando uma nova funcionalidade para saque de dinheiro
+export const withdraw = async (id: number, value: number): Promise<number | null> => {
+    const account = await find(id)
+
+    if(!account){
+        return null
+    }
+
+    return account.withdraw(value)
+}
+

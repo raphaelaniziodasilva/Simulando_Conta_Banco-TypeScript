@@ -93,22 +93,19 @@ accountsRouter.put("/:id", async(req: Request, res: Response) => {
     // transformando o id para inteiro
     const id: number = parseInt(req.params.id, 10)
     try {
-        // criando como uma nova conta com o valor que vem do body ou seja criando uma conta que vem com o valor que esta dentro do body do postaman
-       const accountUpdate: Account = req.body
-
        // verificando se a conta existe
        const account: Account = await AccountService.find(id)
 
        // se a conta existir vamos fazer a atualização
        if(account) {
-          const updateAccount = await AccountService.update(id, accountUpdate)
-          return res.status(200).json(updateAccount)
+
+            let accountUpdate: Account = new Account(req.body.account_number, req.body.agency, account.getClient(), account.getId())
+
+            const updateAccount = await AccountService.update(id, accountUpdate)
+            return res.status(200).json(updateAccount)
         } 
 
-        // se a conta não existir eu quero que crie a conta
-       const newAccount = await AccountService.create(accountUpdate)
-
-        return res.status(201).json(newAccount)
+        return res.status(404).json("Account not found")
     } catch (error: any) {
         return res.status(500).send(error.message)        
     }
@@ -122,7 +119,7 @@ accountsRouter.delete("/:id", async(req: Request, res: Response) => {
 
         await AccountService.remove(id)
 
-        return res.status(204)
+        return res.status(204).send("Account deleted")
     } catch (error: any) {
         return res.status(500).send(error.message)        
     }
@@ -158,6 +155,28 @@ accountsRouter.post("/:id/deposit", async(req: Request, res: Response) => {
         return res.status(500).send(error.message)
     }
 
+} )
+
+accountsRouter.post("/withdraw/:id", async (req: Request, res: Response) => {
+    try {
+        const id: number = parseInt(req.params.id, 10)
+
+        const account: Account = await AccountService.find(id)
+
+        if(account) {
+            const value: number = parseFloat(req.body.value)
+
+            const balance: number | null = await AccountService.withdraw(id, value)
+
+            let message: string = (value <= 0)? "Error! Negative or zero value is not allowed": "Withdrawal made"
+            return res.status(201).json({message: message, newBalance: balance})
+        }
+
+        return res.status(404).send("Account not found")   
+
+    } catch (error: any) {
+        return res.status(500).send(error.message)        
+    }
 } )
 
 // agora vamos para o nosso server.ts
