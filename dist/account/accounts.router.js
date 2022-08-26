@@ -116,7 +116,7 @@ exports.accountsRouter.put("/:id", (req, res) => __awaiter(void 0, void 0, void 
         const account = yield AccountService.find(id);
         // se a conta existir vamos fazer a atualização
         if (account) {
-            let accountUpdate = new account_class_1.Account(req.body.account_number, req.body.agency, account.getClient(), account.getId());
+            let accountUpdate = new account_class_1.Account(req.body.account_number, req.body.agency, req.body.client, account.getId());
             const updateAccount = yield AccountService.update(id, accountUpdate);
             return res.status(200).json(updateAccount);
         }

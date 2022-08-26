@@ -99,7 +99,7 @@ accountsRouter.put("/:id", async(req: Request, res: Response) => {
        // se a conta existir vamos fazer a atualização
        if(account) {
 
-            let accountUpdate: Account = new Account(req.body.account_number, req.body.agency, account.getClient(), account.getId())
+            let accountUpdate: Account = new Account(req.body.account_number, req.body.agency, req.body.client, account.getId())
 
             const updateAccount = await AccountService.update(id, accountUpdate)
             return res.status(200).json(updateAccount)
